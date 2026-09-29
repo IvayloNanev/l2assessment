@@ -4,6 +4,8 @@
 
 See [ASSESSMENT.md](./ASSESSMENT.md) for the top three findings, implemented priority/routing improvement, before-and-after results, and testing limitations. Run `npm test` for the regression suite.
 
+The configured model must support strict JSON-schema output. The default `openai/gpt-oss-20b` was verified with live requests. If classification fails or the message is unclear, the app explicitly requests human review instead of fabricating a category.
+
 ## Overview
 
 The Customer Inbox Triage app is a lightweight AI-powered tool that helps classify customer support messages and recommend actions. It uses Groq AI to categorize messages, applies rule-based urgency scoring, and suggests next steps based on predefined templates.
