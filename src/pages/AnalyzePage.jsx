@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { categorizeMessage } from '../utils/llmHelper'
-import { calculateUrgency } from '../utils/urgencyScorer'
+import { assessUrgency } from '../utils/urgencyScorer'
 import { getRecommendedAction } from '../utils/templates'
 
 function AnalyzePage() {
@@ -29,20 +29,23 @@ function AnalyzePage() {
     
     try {
       // Run categorization (LLM call)
-      const { category, reasoning } = await categorizeMessage(message)
+      const { category, reasoning, source, needsReview } = await categorizeMessage(message)
       
       // Calculate urgency (rule-based)
-      const urgency = calculateUrgency(message)
+      const { urgency, reason: urgencyReason } = assessUrgency(message)
       
       // Get recommended action (template-based)
-      const recommendedAction = getRecommendedAction(category)
+      const recommendedAction = getRecommendedAction(category, urgency)
       
       const analysisResult = {
         message,
         category,
         urgency,
+        urgencyReason,
         recommendedAction,
         reasoning,
+        source,
+        needsReview,
         timestamp: new Date().toISOString()
       }
 
@@ -76,10 +79,11 @@ function AnalyzePage() {
 
           {/* Input Section */}
           <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label htmlFor="customer-message" className="block text-sm font-semibold text-gray-700 mb-2">
               Customer Message
             </label>
             <textarea
+              id="customer-message"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Paste customer message here..."
@@ -129,11 +133,18 @@ function AnalyzePage() {
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-xl font-bold text-gray-900 mb-4">Analysis Results</h2>
             
+            {results.needsReview && (
+              <p role="status" className="bg-yellow-50 border border-yellow-200 text-yellow-900 rounded-lg p-3 mb-4">
+                {results.source === 'manual'
+                  ? 'AI classification unavailable. Human review required; you can try analyzing again.'
+                  : 'More context is needed. Human review required.'}
+              </p>
+            )}
             <div className="space-y-4">
               <div>
                 <div className="text-sm font-semibold text-gray-600 mb-1">Category</div>
                 <div className="inline-block bg-blue-100 text-blue-800 px-4 py-2 rounded-lg font-semibold">
-                  {results.category}
+                  {results.category === 'Unknown' ? 'Needs human review' : results.category}
                 </div>
               </div>
 
@@ -146,6 +157,7 @@ function AnalyzePage() {
                 }`}>
                   {results.urgency}
                 </div>
+                <p className="text-sm text-gray-600 mt-2">{results.urgencyReason}</p>
               </div>
 
               <div>
@@ -156,7 +168,7 @@ function AnalyzePage() {
               </div>
 
               <div>
-                <div className="text-sm font-semibold text-gray-600 mb-1">AI Reasoning</div>
+                <div className="text-sm font-semibold text-gray-600 mb-1">{results.source === 'ai' ? 'AI Classification Explanation' : 'Review Note'}</div>
                 <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                   <div className="prose prose-sm max-w-none text-gray-700">
                     <ReactMarkdown>
@@ -170,7 +182,7 @@ function AnalyzePage() {
             <div className="mt-6 pt-4 border-t border-gray-200">
               <button
                 onClick={() => {
-                  const text = `Category: ${results.category}\nUrgency: ${results.urgency}\nRecommendation: ${results.recommendedAction}\n\nReasoning: ${results.reasoning}`
+                  const text = `Category: ${results.category === 'Unknown' ? 'Needs human review' : results.category}\nUrgency: ${results.urgency}\nClassification source: ${results.source}\nHuman review required: ${results.needsReview ? 'Yes' : 'No'}\nPriority reason: ${results.urgencyReason}\nRecommendation: ${results.recommendedAction}\n\nReasoning: ${results.reasoning}`
                   navigator.clipboard.writeText(text)
                   alert('Results copied to clipboard!')
                 }}

@@ -1,5 +1,11 @@
 # Customer Inbox Triage App
 
+## Week 2 assessment
+
+See [ASSESSMENT.md](./ASSESSMENT.md) for the top three findings, implemented priority/routing improvement, before-and-after results, and testing limitations. Run `npm test` for the regression suite.
+
+The configured model must support strict JSON-schema output. The default `openai/gpt-oss-20b` was verified with live requests. If classification fails or the message is unclear, the app explicitly requests human review instead of fabricating a category.
+
 ## Overview
 
 The Customer Inbox Triage app is a lightweight AI-powered tool that helps classify customer support messages and recommend actions. It uses Groq AI to categorize messages, applies rule-based urgency scoring, and suggests next steps based on predefined templates.
@@ -11,14 +17,14 @@ Support teams waste time manually reading and triaging customer messages. This t
 ## Tech Stack
 
 - **Frontend**: React + Vite + Tailwind CSS
-- **AI**: Groq API (Llama 3.3 70B - Free tier)
+- **AI**: Groq API (configurable chat model; defaults to openai/gpt-oss-20b)
 - **Runtime**: Browser-based (local development only)
 
 ## Setup Instructions
 
 ### Prerequisites
 
-- Node.js (v16 or higher)
+- Node.js (v22.12 or higher)
 - npm or yarn
 - Groq API key (FREE - get from https://console.groq.com)
 
@@ -45,6 +51,7 @@ Support teams waste time manually reading and triaging customer messages. This t
    Edit `.env.local` and add your Groq API key:
    ```
    VITE_GROQ_API_KEY=gsk_your-actual-key-here
+   VITE_GROQ_MODEL=openai/gpt-oss-20b
    ```
    
    Get your FREE API key from: https://console.groq.com/keys
@@ -63,7 +70,7 @@ Support teams waste time manually reading and triaging customer messages. This t
 1. **Paste Message**: User pastes a customer support message into the text area
 2. **Analyze**: Click "Analyze Message" to process the input
 3. **Classification**: The app runs three processes in parallel:
-   - **Category Classification** (LLM): Uses Groq AI (Llama 3.3 70B) to categorize the message
+   - **Category Classification** (LLM): Uses a Groq-hosted chat model to categorize the message
    - **Urgency Scoring** (Rule-based): Applies simple rules to determine urgency
    - **Recommendation** (Template-based): Maps category to a recommended action
 4. **Display Results**: Shows category, urgency tag, recommended action, and AI reasoning
