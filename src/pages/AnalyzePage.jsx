@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { categorizeMessage } from '../utils/llmHelper'
-import { calculateUrgency } from '../utils/urgencyScorer'
+import { assessUrgency } from '../utils/urgencyScorer'
 import { getRecommendedAction } from '../utils/templates'
 
 function AnalyzePage() {
@@ -32,15 +32,16 @@ function AnalyzePage() {
       const { category, reasoning } = await categorizeMessage(message)
       
       // Calculate urgency (rule-based)
-      const urgency = calculateUrgency(message)
+      const { urgency, reason: urgencyReason } = assessUrgency(message)
       
       // Get recommended action (template-based)
-      const recommendedAction = getRecommendedAction(category)
+      const recommendedAction = getRecommendedAction(category, urgency)
       
       const analysisResult = {
         message,
         category,
         urgency,
+        urgencyReason,
         recommendedAction,
         reasoning,
         timestamp: new Date().toISOString()
@@ -76,10 +77,11 @@ function AnalyzePage() {
 
           {/* Input Section */}
           <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label htmlFor="customer-message" className="block text-sm font-semibold text-gray-700 mb-2">
               Customer Message
             </label>
             <textarea
+              id="customer-message"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Paste customer message here..."
@@ -146,6 +148,7 @@ function AnalyzePage() {
                 }`}>
                   {results.urgency}
                 </div>
+                <p className="text-sm text-gray-600 mt-2">{results.urgencyReason}</p>
               </div>
 
               <div>
@@ -170,7 +173,7 @@ function AnalyzePage() {
             <div className="mt-6 pt-4 border-t border-gray-200">
               <button
                 onClick={() => {
-                  const text = `Category: ${results.category}\nUrgency: ${results.urgency}\nRecommendation: ${results.recommendedAction}\n\nReasoning: ${results.reasoning}`
+                  const text = `Category: ${results.category}\nUrgency: ${results.urgency}\nPriority reason: ${results.urgencyReason}\nRecommendation: ${results.recommendedAction}\n\nReasoning: ${results.reasoning}`
                   navigator.clipboard.writeText(text)
                   alert('Results copied to clipboard!')
                 }}
