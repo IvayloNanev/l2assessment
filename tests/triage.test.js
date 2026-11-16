@@ -4,6 +4,14 @@ import { assessUrgency, calculateUrgency } from '../src/utils/urgencyScorer.js'
 import { getRecommendedAction, shouldEscalate } from '../src/utils/templates.js'
 
 const cases = [
+  ['Database connection lost', 'High'],
+  ['Please help: our database is unavailable', 'High'],
+  ['DB connection has been lost', 'High'],
+  ['Database connection failed yesterday', 'Medium'],
+  ['What if the database connection failed?', 'Medium'],
+  ['No database connection lost', 'Medium'],
+  ['Database connection lost, now restored', 'Medium'],
+  ['How do I configure a database connection?', 'Low'],
   ['Our production server is down', 'High'],
   ['Please help, all customers cannot log in and our business is blocked.', 'High'],
   ['The checkout is unavailable. Could you help us please?', 'High'],

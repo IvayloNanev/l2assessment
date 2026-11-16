@@ -1,6 +1,6 @@
 # Customer Inbox Triage App
 
-## Week 2 assessment
+## Week 8 assessment
 
 See [ASSESSMENT.md](./ASSESSMENT.md) for the top three findings, implemented priority/routing improvement, before-and-after results, and testing limitations. Run `npm test` for the regression suite.
 

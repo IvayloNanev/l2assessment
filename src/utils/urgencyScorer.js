@@ -4,6 +4,10 @@
  */
 const criticalSignals = [
   {
+    pattern: /\b(?:database|db)\s+(?:connection\s+(?:(?:is|was|has been)\s+)?(?:lost|failed)|(?:(?:is|are)\s+)?(?:down|unavailable|offline))\b/,
+    reason: 'A database outage may be blocking core customer workflows.'
+  },
+  {
     pattern: /\b(?:production(?: server| system)?|server|service|site|website|checkout|payment system)\s+(?:(?:is|are)\s+)?(?:down|unavailable|offline)\b/,
     reason: 'A service outage may be blocking customers or revenue.'
   },

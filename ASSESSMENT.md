@@ -1,4 +1,26 @@
-# Week 2 Technical Assessment — Relay AI
+# Week 8 Technical Assessment — Relay AI
+
+## November 16, 2026 verification and improvement
+
+The existing fork already contained the merged prioritization and structured-classification work described below. This run preserved that work, cloned the upstream project, fetched the fork, and added a focused database-outage improvement on `codex/week8-assessment`.
+
+Reproduced upstream priorities directly: `Database connection lost`, `Server down now`, and `Please help, our production server is down` all returned Low. The fork fixed server outages but still returned Medium for `Database connection lost`. Added bounded database/DB connection-loss and outage detection so this core-workflow failure receives High urgency and the existing immediate human escalation recommendation. Eight new cases cover current failures, historical reports, hypotheticals, negation, restored connections and routine configuration questions.
+
+Current verification: **70 automated tests passed**, Vite production build passed, and ESLint passed for the changed JavaScript files. Dependencies were installed with pnpm using the package manifest's version ranges (Vite 7.3.8); this run did not verify the older npm lockfile installation or change dependency declarations. Earlier September results below are historical evidence from the existing fork, not fresh live-AI tests.
+
+Fresh browser tests on this checkout:
+
+| Message | Observed urgency | Observed action |
+| --- | --- | --- |
+| Database connection lost | High | Immediate support-lead incident escalation |
+| Database connection failed yesterday | Medium | Human triage |
+| Thank you for your excellent service!!!!! | Low | Human triage |
+
+All three persisted in History after reload. No Groq key was configured in this checkout: each result explicitly displayed AI classification unavailable / needs human review. Live provider classification was **not retested**. Priority and escalation continue to work without the model. The production API-key exposure remains a proposed improvement, and the English rules still have the language limitations recorded below.
+
+The three highest-impact areas remain: impact-based priority/routing, trustworthy classification with visible failure states, and server-side provider-key handling. The first two have implementations in the fork; this run extends the first. There is no measured production business-outcome claim.
+
+`IDE-CONVERSATION.md` contains the user/assistant conversation exported during this run, through the submission preparation update. Tool invocations and hidden reasoning are not part of that conversation export.
 
 ## Setup and scope
 
